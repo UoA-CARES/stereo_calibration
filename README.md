@@ -47,9 +47,13 @@ Tests to be added
 ## Applications
 
 ### Stereo Calibration Node
-This node runs in two modes.\
-First mode, runs live and will collate images being published live off a pair of stereo cameras.
-Second mode, will load stereo image pairs from a provided source location.
+This node runs in two modes.
+
+* First Mode
+    * Runs live and will collate images being published live off a pair of stereo cameras.
+* Second mode
+    * Load stereo image pairs from a provided source location.
+
 Images and calibration data is saved into a specified folder location (same folder as the stereo pair images).
 If a folder is not specified the location will default to ~/calibration_images/M_D/N.
 
