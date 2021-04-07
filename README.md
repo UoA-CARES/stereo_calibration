@@ -174,8 +174,8 @@ roslaunch stereo_calibration file_stereo_calibration.launch
 This node/service will run a calibration service- using the cares_msgs/CalibrationService service type on the service topic "stereo_calibration".
 
 #### Service Msg
-The service takes a directory location of stereo pair images and returns a resulting cares_msgs/StereoCameraInfo message.\
-The calibration data is also saved into the image_directory but the calibration service. 
+The service takes a directory location of stereo pair images and returns a resulting cares_msgs/StereoCameraInfo message.
+The calibration data is also saved into the image_directory by the calibration service. 
 ```
 string image_directory
 ---
