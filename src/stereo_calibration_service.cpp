@@ -1,3 +1,7 @@
+//
+// Created by henry on 7/04/21.
+//
+
 #include "ros/ros.h"
 #include <ros/package.h>
 #include <message_filters/subscriber.h>
@@ -20,6 +24,8 @@
 #include "CheckerCalibrator.h"
 #include "parameters.h"
 #include "common.h"
+#include "cares_msgs/StereoCameraInfo.h"
+#include "cares_msgs/CalibrationService.h"
 
 using namespace sensor_msgs;
 using namespace message_filters;
@@ -52,67 +58,18 @@ void collectImagesFromFolder(std::string image_load_file_path){
   }
 }
 
-int getch() {
-  static struct termios oldt, newt;
-  tcgetattr(STDIN_FILENO, &oldt);           // save old settings
-  newt = oldt;
-  newt.c_cc[VMIN] = 0;
-  newt.c_cc[VTIME] = 0;
-  newt.c_lflag &= ~(ICANON);                 // disable buffering
-  tcsetattr(STDIN_FILENO, TCSANOW, &newt);  // apply new settings
+bool calibrationCallback(cares_msgs::CalibrationServiceRequest &request, cares_msgs::CalibrationServiceResponse &response) {
+  std::string image_directory = request.image_directory;
 
-  int c = getchar();  // read character (non-blocking)
+  collectImagesFromFolder(image_directory);
 
-  tcsetattr(STDIN_FILENO, TCSANOW, &oldt);  // restore old settings
-  return c;
-}
-
-void imageCallback(const sensor_msgs::ImageConstPtr &left, const sensor_msgs::ImageConstPtr &right) {
-  Mat left_image  = convertToMat(left);
-  Mat right_image = convertToMat(right);
-  calibrator->processImages(left_image, right_image, save_directory);
-}
-
-void collectImagesFromStream(){
-  ROS_INFO("Calibrating from Stream");
-
-  ros::NodeHandle nh;
-  ros::NodeHandle nh_private("~");
-
-  std::string left_camera_node = "";
-  std::string right_camera_node = "";
-  if(nh_private.hasParam(CARES::Calibration::CAMERA_NODE_LEFT_S) && nh_private.hasParam(CARES::Calibration::CAMERA_NODE_RIGHT_S)){
-    nh_private.getParam(CARES::Calibration::CAMERA_NODE_LEFT_S, left_camera_node);
-    nh_private.getParam(CARES::Calibration::CAMERA_NODE_RIGHT_S, right_camera_node);
-    ROS_INFO("Subscribing to - left %s right %s", left_camera_node.c_str(), right_camera_node.c_str());
-  }
-  else{
-    ROS_ERROR("Undefined camera nodes");
-    exit(1);
-  }
-
-  //Setup exact time filter
-  message_filters::Subscriber<sensor_msgs::Image> left_sub(nh, left_camera_node,  1);
-  message_filters::Subscriber<sensor_msgs::Image> right_sub(nh, right_camera_node, 1);
-  typedef sync_policies::ExactTime<sensor_msgs::Image, sensor_msgs::Image> ExactSyncPolicy;
-  typedef sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image> ApproxSyncPolicy;
-  Synchronizer<ExactSyncPolicy> sync_exact(ExactSyncPolicy(10), left_sub, right_sub);
-  sync_exact.registerCallback(imageCallback);
-
-  ROS_INFO("Ready to take images");
-  ros::Rate rate(40);
-  while(ros::ok()){
-    char c = getch();
-    ROS_WARN_THROTTLE(5, "Press e to stop capturing images");
-    if(c == 'e')
-      break;
-    ros::spinOnce();
-    rate.sleep();
-  }
+  cares_msgs::StereoCameraInfo stereo_info = calibrator->calibrate(image_directory);
+  response.stereo_info = stereo_info;
+  return true;
 }
 
 int main(int argc, char **argv){
-  ros::init(argc, argv, "stereo_calibration_node");
+  ros::init(argc, argv, "stereo_calibration_service");
   ros::NodeHandle nh;
   ros::NodeHandle nh_private("~");
 
@@ -182,47 +139,9 @@ int main(int argc, char **argv){
       break;
   }
 
-  //Set save directory for calibration data
-  save_directory = "";
-  if(nh_private.hasParam(CARES::Calibration::SAVE_DIRECTORY_PATH_S)){
-    nh_private.getParam(CARES::Calibration::SAVE_DIRECTORY_PATH_S, save_directory);
-  }
-  if(save_directory == "") {
-    ROS_INFO("Using default save location");
-    //Get home path: /home/user
-    const char *env = getenv("HOME");
-    std::string home_path = "";
-    home_path.append(env);
+  ROS_INFO("Setup calibration service");
+  ros::ServiceServer service = nh.advertiseService("stereo_calibration", calibrationCallback);
 
-    std::string image_save_file_path = home_path + "/calibration_images/";
-
-    //Get current date and time to use as folder for saving image and calibration data
-    time_t t = time(NULL);
-    tm *timePtr = localtime(&t);
-    save_directory += image_save_file_path + std::to_string(timePtr->tm_mon + 1) + "_" + std::to_string(timePtr->tm_mday);
-
-    int id = 0;
-    std::string temp = save_directory + "/" + std::to_string(id);
-    while (boost::filesystem::exists(temp)) {
-      temp = save_directory + "/" + std::to_string(++id);
-    }
-    save_directory = temp;
-    boost::filesystem::create_directories(save_directory);
-    save_directory = save_directory+"/";
-  }
-  ROS_INFO("Saving calibration data to: %s", save_directory.c_str());
-
-  //Determine if calibrating from images from live stream or folder of precollected images
-  if(nh_private.hasParam(CARES::Calibration::IMAGE_PATH_S)){
-    std::string image_load_file_path;
-    nh_private.getParam(CARES::Calibration::IMAGE_PATH_S, image_load_file_path);
-    collectImagesFromFolder(image_load_file_path);
-  }else{
-    collectImagesFromStream();
-  }
-
-  ROS_INFO("Calibrating");
-  calibrator->calibrate(save_directory);
-  ROS_INFO("Calibration Completed");
+  ros::spin();
 }
 

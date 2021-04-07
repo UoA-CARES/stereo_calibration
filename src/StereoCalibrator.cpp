@@ -4,13 +4,77 @@
 
 #include "StereoCalibrator.h"
 
-void StereoCalibrator::calibrate(std::string save_directory) {
+void setCameraInfo(std::string camera_name,
+                   Size image_size,
+                   cv::Mat K,
+                   cv::Mat D,
+                   cv::Mat P,
+                   cv::Mat R,
+                   sensor_msgs::CameraInfo &camera_info){
+  //Frame ID is named after the camera name
+  camera_info.header.frame_id = camera_name;
+
+  //Size of image at calibration
+  camera_info.width  = image_size.width;
+  camera_info.height = image_size.width;
+
+  std::vector<double>K_v(K.begin<double>(), K.end<double>());
+  std::vector<double>P_v(P.begin<double>(), P.end<double>());
+  std::vector<double>R_v(R.begin<double>(), R.end<double>());
+
+  //Intrinsic parameters
+  camera_info.D = D;//dist
+  for (int i=0; i<K_v.size(); i++)camera_info.K[i] = (K_v[i]);
+  for (int i=0; i<P_v.size(); i++)camera_info.P[i] = (P_v[i]);
+  for (int i=0; i<R_v.size(); i++)camera_info.R[i] = (R_v[i]);
+
+  //Default is plump bob
+  //TODO add this to calibration file and read from there
+  camera_info.distortion_model = "plumb_bob";
+
+  camera_info.binning_x = 0;//width
+  camera_info.binning_y = 0;//height
+
+  sensor_msgs::RegionOfInterest roi;
+  camera_info.roi = roi;
+}
+
+cares_msgs::StereoCameraInfo setStereoInfo(Mat K1, Mat D1, Mat P1, Mat R1,
+                                           Mat K2, Mat D2, Mat P2, Mat R2,
+                                           Mat Q, Mat R, Mat T,
+                                           Size image_size){
+  cares_msgs::StereoCameraInfo stereo_camera_info;
+
+  //Left parameters
+  sensor_msgs::CameraInfo left_info;
+  setCameraInfo("left", image_size, K1, D1, P1, R1, left_info);
+  stereo_camera_info.left_info  = left_info;
+
+  //Right parameters
+  sensor_msgs::CameraInfo right_info;
+  setCameraInfo("right", image_size, K2, D2, P2, R2, right_info);
+  stereo_camera_info.right_info = right_info;
+
+  //Stereo parameters
+  std::vector<double>Q_v(Q.begin<double>(), Q.end<double>());
+  std::vector<double>R_v(R.begin<double>(), R.end<double>());
+  std::vector<double>T_v(T.begin<double>(), T.end<double>());
+
+  stereo_camera_info.header.frame_id = "left";
+  for (int i=0; i<Q_v.size(); i++)stereo_camera_info.Q[i] = Q_v[i];
+  for (int i=0; i<R_v.size(); i++)stereo_camera_info.R_left_right[i] = R_v[i];
+  for (int i=0; i<T_v.size(); i++)stereo_camera_info.T_left_right[i] = T_v[i];
+  return stereo_camera_info;
+}
+
+cares_msgs::StereoCameraInfo StereoCalibrator::calibrate(std::string save_directory) {
   ROS_INFO("Calibrating the stereo camera");
   ROS_INFO("%i %i", all_corners[0].size(), all_corners[1].size());
 
+  cares_msgs::StereoCameraInfo stereo_info;
   if(all_corners[0].size() == 0 || all_corners[1].size() == 0){
     ROS_ERROR("No images have been captured or loaded");
-    return;
+    return stereo_info;
   }
 
   Mat camera_matrix[2];
@@ -66,6 +130,11 @@ void StereoCalibrator::calibrate(std::string save_directory) {
   file.write("D2", dist_coeffs[1]);
   file.write("P2", P2);
   file.write("R2", R2);
+
+  stereo_info = setStereoInfo(camera_matrix[0], dist_coeffs[0], P1, R1,
+                              camera_matrix[1], dist_coeffs[1], P2, R2,
+                              Q, R, T, image_size);
+  return stereo_info;
 }
 
 double closestMatchScore(const std::vector<std::vector<Point2f> > &db_points, const std::vector<Point2f> &corner_points) {

@@ -17,6 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
    image_transport
    sensor_msgs
    message_generation
+   cares_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -141,9 +142,34 @@ add_executable(stereo_calibration_node src/stereo_calibration_node.cpp
         src/CharucoCalibrator.cpp
         src/CheckerCalibrator.h
         src/CheckerCalibrator.cpp
-        src/parameters.h)
+        src/parameters.h
+        src/common.h)
 target_link_libraries(stereo_calibration_node ${catkin_LIBRARIES})
 add_dependencies(stereo_calibration_node ${catkin_EXPORTED_TARGETS})
+
+add_executable(stereo_calibration_service src/stereo_calibration_service.cpp
+        src/StereoCalibrator.h
+        src/StereoCalibrator.cpp
+        src/CharucoCalibrator.h
+        src/CharucoCalibrator.cpp
+        src/CheckerCalibrator.h
+        src/CheckerCalibrator.cpp
+        src/parameters.h
+        src/common.h)
+target_link_libraries(stereo_calibration_service ${catkin_LIBRARIES})
+add_dependencies(stereo_calibration_service ${catkin_EXPORTED_TARGETS})
+
+add_executable(test_service src/test_service.cpp
+        src/StereoCalibrator.h
+        src/StereoCalibrator.cpp
+        src/CharucoCalibrator.h
+        src/CharucoCalibrator.cpp
+        src/CheckerCalibrator.h
+        src/CheckerCalibrator.cpp
+        src/parameters.h
+        src/common.h)
+target_link_libraries(test_service ${catkin_LIBRARIES})
+add_dependencies(test_service ${catkin_EXPORTED_TARGETS})
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries

@@ -14,6 +14,9 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include <opencv2/aruco/charuco.hpp>
 
+#include "sensor_msgs/CameraInfo.h"
+#include "cares_msgs/StereoCameraInfo.h"
+
 #include <boost/filesystem/operations.hpp>
 
 using namespace cv;
@@ -44,7 +47,7 @@ public:
     cv::moveWindow(right_window, 640, 20);
   }
 
-  void calibrate(std::string save_directory);
+    cares_msgs::StereoCameraInfo calibrate(std::string save_directory);
   void processImages(Mat &left_image, Mat &right_image, std::string save_directory="");
 
 protected:
