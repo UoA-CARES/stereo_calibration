@@ -11,7 +11,7 @@ These instructions will get you a copy of the project up and running on your loc
 What things you need to install the software and how to install them
 
 ```
-1) ROS Melodic (no known reason why future versions will not work)
+1) ROS Neotic - works in Melodic as well
 
 2) Pull master version of cares_msgs
     a) cd ~/catkin_ws/src
