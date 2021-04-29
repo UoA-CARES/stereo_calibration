@@ -16,7 +16,7 @@ void setCameraInfo(std::string camera_name,
 
   //Size of image at calibration
   camera_info.width  = image_size.width;
-  camera_info.height = image_size.width;
+  camera_info.height = image_size.height;
 
   std::vector<double>K_v(K.begin<double>(), K.end<double>());
   std::vector<double>P_v(P.begin<double>(), P.end<double>());

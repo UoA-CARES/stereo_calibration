@@ -4,7 +4,7 @@
     <arg name="board_width"   default="8"/>
     <arg name="board_height"  default="5"/>
 
-    <arg name="square_length" default="39"/><!--mm-->
+    <arg name="square_length" default="45"/><!--mm-->
 
     <arg name="image_width"  default="4000"/>
     <arg name="image_height" default="3000"/>
@@ -15,7 +15,7 @@
     <arg name="method" default="1"/>
 
     <!--Charuco marker length if required-->
-    <arg name="marker_length" default="20.0"/><!--mm-->
+    <arg name="marker_length" default="23.0"/><!--mm-->
 
     <node name="stereo_calibration_service" pkg="stereo_calibration" type="stereo_calibration_service" output="screen">
         <param name ="board_width"  value="$(arg board_width)"/>
