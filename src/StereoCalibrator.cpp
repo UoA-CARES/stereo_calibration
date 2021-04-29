@@ -186,13 +186,13 @@ void StereoCalibrator::processImages(Mat &left_image, Mat &right_image, std::str
         }
         ROS_INFO("Added new calibration pair - %i total pairs", all_corners[0].size());
       }
-      else{
-        ROS_WARN("Similar pair already captured - left %f right %f Threshold %f", min_diff_left, min_diff_right, this->average_min_difference_threshold);
-      }
+//      else{
+//        ROS_WARN("Similar pair already captured - left %f right %f Threshold %f", min_diff_left, min_diff_right, this->average_min_difference_threshold);
+//      }
     }
-    else{
-      ROS_WARN("To few points for accurate calibration - %i", left_corners.size());
-    }
+//    else{
+//      ROS_WARN("To few points for accurate calibration - %i", left_corners.size());
+//    }
   }
   else{
     ROS_ERROR("Corners are not balanced between Left %i and Right %i", left_corners.size(), right_corners.size());

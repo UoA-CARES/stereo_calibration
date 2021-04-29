@@ -52,21 +52,6 @@ void collectImagesFromFolder(std::string image_load_file_path){
   }
 }
 
-int getch() {
-  static struct termios oldt, newt;
-  tcgetattr(STDIN_FILENO, &oldt);           // save old settings
-  newt = oldt;
-  newt.c_cc[VMIN] = 0;
-  newt.c_cc[VTIME] = 0;
-  newt.c_lflag &= ~(ICANON);                 // disable buffering
-  tcsetattr(STDIN_FILENO, TCSANOW, &newt);  // apply new settings
-
-  int c = getchar();  // read character (non-blocking)
-
-  tcsetattr(STDIN_FILENO, TCSANOW, &oldt);  // restore old settings
-  return c;
-}
-
 void imageCallback(const sensor_msgs::ImageConstPtr &left, const sensor_msgs::ImageConstPtr &right) {
   Mat left_image  = convertToMat(left);
   Mat right_image = convertToMat(right);
@@ -102,8 +87,8 @@ void collectImagesFromStream(){
   ROS_INFO("Ready to take images");
   ros::Rate rate(40);
   while(ros::ok()){
-    char c = getch();
-    ROS_WARN_THROTTLE(5, "Press e to stop capturing images");
+    char c = cv::waitKey(10);
+    ROS_WARN_THROTTLE(5, "Press e on the image windows to stop capturing images");
     if(c == 'e')
       break;
     ros::spinOnce();

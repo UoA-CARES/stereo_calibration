@@ -8,19 +8,16 @@
     <arg name="camera_right" default="right/image_raw"/>
 
     <!--Number of corners-->
-    <arg name="board_width"   default="8"/>
-    <arg name="board_height"  default="5"/>
-    <arg name="square_length" default="39.0"/><!--mm-->
-    <arg name="image_width"  default="4000"/>
-    <arg name="image_height" default="3000"/>
+    <arg name="board_width"   default="9"/>
+    <arg name="board_height"  default="6"/>
+    <arg name="square_length" default="25.0"/><!--mm-->
+    <arg name="image_width"  default="1936"/>
+    <arg name="image_height" default="1216"/>
 
     <!--Calibration modes-->
     <!--0 Checker-->
     <!--1 Charuco-->
-    <arg name="method" default="1"/>
-
-    <!--Charuco marker length if required-->
-    <arg name="marker_length" default="20.0"/><!--mm-->
+    <arg name="method" default="0"/>
 
     <node name="stereo_calibration_node" pkg="stereo_calibration" type="stereo_calibration_node" output="screen">
         <param name ="save_directory"  value="$(arg save_directory)"/>
@@ -36,7 +33,5 @@
         <param name ="image_height" value="$(arg image_height)"/>
 
         <param name ="method" value="$(arg method)"/>
-
-        <param name ="marker_length" value="$(arg marker_length)"/>
     </node>
 </launch>
