@@ -144,7 +144,7 @@ add_executable(stereo_calibration_node src/stereo_calibration_node.cpp
         src/CheckerCalibrator.cpp
         src/parameters.h
         src/common.h)
-target_link_libraries(stereo_calibration_node ${catkin_LIBRARIES})
+target_link_libraries(stereo_calibration_node ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 add_dependencies(stereo_calibration_node ${catkin_EXPORTED_TARGETS})
 
 add_executable(stereo_calibration_service src/stereo_calibration_service.cpp
@@ -156,7 +156,7 @@ add_executable(stereo_calibration_service src/stereo_calibration_service.cpp
         src/CheckerCalibrator.cpp
         src/parameters.h
         src/common.h)
-target_link_libraries(stereo_calibration_service ${catkin_LIBRARIES})
+target_link_libraries(stereo_calibration_service ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 add_dependencies(stereo_calibration_service ${catkin_EXPORTED_TARGETS})
 
 add_executable(test_service src/test_service.cpp
@@ -168,7 +168,7 @@ add_executable(test_service src/test_service.cpp
         src/CheckerCalibrator.cpp
         src/parameters.h
         src/common.h)
-target_link_libraries(test_service ${catkin_LIBRARIES})
+target_link_libraries(test_service ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 add_dependencies(test_service ${catkin_EXPORTED_TARGETS})
 
 ## Add cmake target dependencies of the library
