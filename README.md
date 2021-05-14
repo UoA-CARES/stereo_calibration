@@ -366,6 +366,5 @@ TBD
 
 ## Acknowledgments
 
-* Matthew Seabright for finding the configuration for the exposure mode
 
 
