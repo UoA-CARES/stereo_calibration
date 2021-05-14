@@ -49,8 +49,8 @@ private:
                         Mat image_copy);
 
 public:
-    CharucoCalibrator(Size board_size, double square_length, double marker_length, int dictionary_id, Size image_size)
-            : StereoCalibrator(board_size, square_length, image_size) {
+    CharucoCalibrator(Size board_size, double square_length, double marker_length, int dictionary_id, Size image_size, double average_min_difference_threshold)
+            : StereoCalibrator(board_size, square_length, image_size, average_min_difference_threshold) {
 
       this->marker_length = marker_length;
       this->dictionary   = aruco::getPredefinedDictionary(aruco::PREDEFINED_DICTIONARY_NAME(dictionary_id));

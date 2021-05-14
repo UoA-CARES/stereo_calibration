@@ -14,16 +14,19 @@ namespace CARES{
 
       const std::string BOARD_WIDTH_I   = "board_width";
       const std::string BOARD_HEIGHT_I  = "board_height";
-      const std::string SQUARE_LENGTH_I = "square_length";
+      const std::string SQUARE_LENGTH_D = "square_length";
 
       const std::string IMAGE_WIDTH_I  = "image_width";
       const std::string IMAGE_HEIGHT_I = "image_height";
 
-      const std::string MARKER_LENGTH_I = "marker_length";
+      const std::string MARKER_LENGTH_D = "marker_length";
+      const std::string DICTIONARY_ID_I = "dictionary";
 
       const std::string IMAGE_PATH_S = "image_path";
 
       const std::string SAVE_DIRECTORY_PATH_S = "save_directory";
+
+      const std::string THRESHOLD_D = "threshold";
   }
 }
 

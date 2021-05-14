@@ -66,12 +66,7 @@ void collectImagesFromStream(){
 
   std::string left_camera_node = "";
   std::string right_camera_node = "";
-  if(nh_private.hasParam(CARES::Calibration::CAMERA_NODE_LEFT_S) && nh_private.hasParam(CARES::Calibration::CAMERA_NODE_RIGHT_S)){
-    nh_private.getParam(CARES::Calibration::CAMERA_NODE_LEFT_S, left_camera_node);
-    nh_private.getParam(CARES::Calibration::CAMERA_NODE_RIGHT_S, right_camera_node);
-    ROS_INFO("Subscribing to - left %s right %s", left_camera_node.c_str(), right_camera_node.c_str());
-  }
-  else{
+  if(!nh_private.getParam(CARES::Calibration::CAMERA_NODE_LEFT_S, left_camera_node) || !nh_private.getParam(CARES::Calibration::CAMERA_NODE_RIGHT_S, right_camera_node)){
     ROS_ERROR("Undefined camera nodes");
     exit(1);
   }
@@ -96,6 +91,31 @@ void collectImagesFromStream(){
   }
 }
 
+std::string getSaveDirectory(){
+  //Get home path: /home/user
+  const char *env = getenv("HOME");
+  std::string home_path = "";
+  home_path.append(env);
+
+  std::string directory = "";
+  std::string image_save_file_path = home_path + "/calibration_images/";
+
+  //Get current date and time to use as folder for saving image and calibration data
+  time_t t = time(NULL);
+  tm *timePtr = localtime(&t);
+
+  directory += image_save_file_path
+            + std::to_string(1900+timePtr->tm_year) + "_"
+            + std::to_string(timePtr->tm_mon+1) + "_"
+            + std::to_string(timePtr->tm_mday) + "_"
+            + std::to_string(timePtr->tm_hour) + "_"
+            + std::to_string(timePtr->tm_min) + "_"
+            + std::to_string(timePtr->tm_sec);
+
+  boost::filesystem::create_directories(directory);
+  return directory + "/";
+}
+
 int main(int argc, char **argv){
   ros::init(argc, argv, "stereo_calibration_node");
   ros::NodeHandle nh;
@@ -103,97 +123,67 @@ int main(int argc, char **argv){
 
   //Load calibration parameters
   Size board_size;
-  if(nh_private.hasParam(CARES::Calibration::BOARD_WIDTH_I) && nh_private.hasParam(CARES::Calibration::BOARD_HEIGHT_I)){
-    nh_private.getParam(CARES::Calibration::BOARD_WIDTH_I, board_size.width);
-    nh_private.getParam(CARES::Calibration::BOARD_HEIGHT_I, board_size.height);
-  }
-  else{
+  if(!nh_private.getParam(CARES::Calibration::BOARD_WIDTH_I, board_size.width) || !nh_private.getParam(CARES::Calibration::BOARD_HEIGHT_I, board_size.height)){
     ROS_ERROR("Undefined board size");
-    exit(1);
+    return 1;
   }
   ROS_INFO("Board size - width %i height %i", board_size.width, board_size.height);
 
   Size image_size;
-  if(nh_private.hasParam(CARES::Calibration::IMAGE_WIDTH_I) && nh_private.hasParam(CARES::Calibration::IMAGE_HEIGHT_I)){
-    nh_private.getParam(CARES::Calibration::IMAGE_WIDTH_I, image_size.width);
-    nh_private.getParam(CARES::Calibration::IMAGE_HEIGHT_I, image_size.height);
-  }
-  else{
+  if(!nh_private.getParam(CARES::Calibration::IMAGE_WIDTH_I, image_size.width) || !nh_private.getParam(CARES::Calibration::IMAGE_HEIGHT_I, image_size.height)){
     ROS_ERROR("Undefined image size");
-    exit(1);
+    return 1;
   }
   ROS_INFO("Image - width: %i height %i", image_size.width, image_size.height);
 
-  double square_length;//3.9/100
-  if(nh_private.hasParam(CARES::Calibration::SQUARE_LENGTH_I)){
-    nh_private.getParam(CARES::Calibration::SQUARE_LENGTH_I, square_length);
-  }
-  else{
+  double square_length;
+  if(!nh_private.getParam(CARES::Calibration::SQUARE_LENGTH_D, square_length)){
     ROS_ERROR("Undefined square length");
-    exit(1);
+    return 1;
   }
-  ROS_INFO("Square length: %f mm", square_length);
+  square_length /= 1000.0;
+  ROS_INFO("Square length: %f m", square_length);
 
   //Determine calibration method
   CalibrationMethod calibration_method;
   int method;
-  if(nh_private.hasParam(CARES::Calibration::CALIBRATION_METHOD_S)){
-    nh_private.getParam(CARES::Calibration::CALIBRATION_METHOD_S, method);
-  }
-  else{
+  if(!nh_private.getParam(CARES::Calibration::CALIBRATION_METHOD_S, method)){
     ROS_ERROR("Undefined calibration method");
-    exit(1);
+    return 1;
   }
   calibration_method = static_cast<CalibrationMethod>(method);
+
+  double average_min_difference_threshold = 0;
+  nh_private.param(CARES::Calibration::THRESHOLD_D, average_min_difference_threshold, average_min_difference_threshold);
+  ROS_INFO("Difference Threshold: %f px", average_min_difference_threshold);
 
   switch(calibration_method){
     case CHECKER:
       ROS_INFO("Checker board calibration");
-      calibrator = new CheckerCalibrator(board_size, square_length, image_size);
+      calibrator = new CheckerCalibrator(board_size, square_length, image_size, average_min_difference_threshold);
       break;
     case CHARUCO:
       ROS_INFO("Charuco board calibration");
       double marker_length;
-      if(nh_private.hasParam(CARES::Calibration::MARKER_LENGTH_I)){
-        nh_private.getParam(CARES::Calibration::MARKER_LENGTH_I, marker_length);
-      }
-      else{
+      if(!nh_private.getParam(CARES::Calibration::MARKER_LENGTH_D, marker_length)){
         ROS_ERROR("Undefined marker length");
-        exit(1);
+        return 1;
       }
-      ROS_INFO("Marker length: %f mm", marker_length);
+      marker_length /= 1000.0;
+      ROS_INFO("Marker length: %f m", marker_length);
       int dictionary_id = aruco::DICT_4X4_50;
-      calibrator = new CharucoCalibrator(board_size, square_length, marker_length, dictionary_id, image_size);
+      nh_private.param(CARES::Calibration::DICTIONARY_ID_I, dictionary_id, dictionary_id);
+      ROS_INFO("Using dictionary ID: %i", dictionary_id);
+      calibrator = new CharucoCalibrator(board_size, square_length, marker_length, dictionary_id, image_size, average_min_difference_threshold);
       break;
   }
 
   //Set save directory for calibration data
   save_directory = "";
-  if(nh_private.hasParam(CARES::Calibration::SAVE_DIRECTORY_PATH_S)){
-    nh_private.getParam(CARES::Calibration::SAVE_DIRECTORY_PATH_S, save_directory);
-  }
+  nh_private.param(CARES::Calibration::SAVE_DIRECTORY_PATH_S, save_directory, save_directory);
   if(save_directory == "") {
     ROS_INFO("Using default save location");
-    //Get home path: /home/user
-    const char *env = getenv("HOME");
-    std::string home_path = "";
-    home_path.append(env);
-
-    std::string image_save_file_path = home_path + "/calibration_images/";
-
-    //Get current date and time to use as folder for saving image and calibration data
-    time_t t = time(NULL);
-    tm *timePtr = localtime(&t);
-    save_directory += image_save_file_path + std::to_string(timePtr->tm_mon + 1) + "_" + std::to_string(timePtr->tm_mday);
-
-    int id = 0;
-    std::string temp = save_directory + "/" + std::to_string(id);
-    while (boost::filesystem::exists(temp)) {
-      temp = save_directory + "/" + std::to_string(++id);
-    }
-    save_directory = temp;
-    boost::filesystem::create_directories(save_directory);
-    save_directory = save_directory+"/";
+    save_directory = getSaveDirectory();
   }
   ROS_INFO("Saving calibration data to: %s", save_directory.c_str());
 

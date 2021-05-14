@@ -90,7 +90,7 @@ void CharucoCalibrator::extractCorners(Mat &image,
   Ptr<aruco::DetectorParameters> detector_params = aruco::DetectorParameters::create();
   aruco::detectMarkers(image, dictionary, marker_corners, marker_ids, detector_params, marker_rejected);
 
-  // refind strategy to detect more markers
+  // refine strategy to detect more markers
   aruco::refineDetectedMarkers(image, this->board, marker_corners, marker_ids, marker_rejected);
 
   // interpolate charuco marker_corners

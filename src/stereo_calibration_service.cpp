@@ -75,67 +75,58 @@ int main(int argc, char **argv){
 
   //Load calibration parameters
   Size board_size;
-  if(nh_private.hasParam(CARES::Calibration::BOARD_WIDTH_I) && nh_private.hasParam(CARES::Calibration::BOARD_HEIGHT_I)){
-    nh_private.getParam(CARES::Calibration::BOARD_WIDTH_I, board_size.width);
-    nh_private.getParam(CARES::Calibration::BOARD_HEIGHT_I, board_size.height);
-  }
-  else{
+  if(!nh_private.getParam(CARES::Calibration::BOARD_WIDTH_I, board_size.width) || !nh_private.getParam(CARES::Calibration::BOARD_HEIGHT_I, board_size.height)){
     ROS_ERROR("Undefined board size");
-    exit(1);
+    return 1;
   }
   ROS_INFO("Board size - width %i height %i", board_size.width, board_size.height);
 
   Size image_size;
-  if(nh_private.hasParam(CARES::Calibration::IMAGE_WIDTH_I) && nh_private.hasParam(CARES::Calibration::IMAGE_HEIGHT_I)){
-    nh_private.getParam(CARES::Calibration::IMAGE_WIDTH_I, image_size.width);
-    nh_private.getParam(CARES::Calibration::IMAGE_HEIGHT_I, image_size.height);
-  }
-  else{
+  if(!nh_private.getParam(CARES::Calibration::IMAGE_WIDTH_I, image_size.width) || !nh_private.getParam(CARES::Calibration::IMAGE_HEIGHT_I, image_size.height)){
     ROS_ERROR("Undefined image size");
-    exit(1);
+    return 1;
   }
   ROS_INFO("Image - width: %i height %i", image_size.width, image_size.height);
 
-  double square_length;//3.9/100
-  if(nh_private.hasParam(CARES::Calibration::SQUARE_LENGTH_I)){
-    nh_private.getParam(CARES::Calibration::SQUARE_LENGTH_I, square_length);
-  }
-  else{
+  double square_length;
+  if(!nh_private.getParam(CARES::Calibration::SQUARE_LENGTH_D, square_length)){
     ROS_ERROR("Undefined square length");
-    exit(1);
+    return 1;
   }
-  ROS_INFO("Square length: %f mm", square_length);
+  square_length /= 1000.0;
+  ROS_INFO("Square length: %f m", square_length);
 
   //Determine calibration method
   CalibrationMethod calibration_method;
   int method;
-  if(nh_private.hasParam(CARES::Calibration::CALIBRATION_METHOD_S)){
-    nh_private.getParam(CARES::Calibration::CALIBRATION_METHOD_S, method);
-  }
-  else{
+  if(!nh_private.getParam(CARES::Calibration::CALIBRATION_METHOD_S, method)){
     ROS_ERROR("Undefined calibration method");
-    exit(1);
+    return 1;
   }
   calibration_method = static_cast<CalibrationMethod>(method);
+
+  double average_min_difference_threshold = 0;
+  nh_private.param(CARES::Calibration::THRESHOLD_D, average_min_difference_threshold, average_min_difference_threshold);
+  ROS_INFO("Difference Threshold: %f", average_min_difference_threshold);
 
   switch(calibration_method){
     case CHECKER:
       ROS_INFO("Checker board calibration");
-      calibrator = new CheckerCalibrator(board_size, square_length, image_size);
+      calibrator = new CheckerCalibrator(board_size, square_length, image_size, average_min_difference_threshold);
       break;
     case CHARUCO:
       ROS_INFO("Charuco board calibration");
       double marker_length;
-      if(nh_private.hasParam(CARES::Calibration::MARKER_LENGTH_I)){
-        nh_private.getParam(CARES::Calibration::MARKER_LENGTH_I, marker_length);
-      }
-      else{
+      if(!nh_private.getParam(CARES::Calibration::MARKER_LENGTH_D, marker_length)){
         ROS_ERROR("Undefined marker length");
-        exit(1);
+        return 1;
       }
-      ROS_INFO("Marker length: %f mm", marker_length);
+      marker_length /= 1000.0;
+      ROS_INFO("Marker length: %f m", marker_length);
       int dictionary_id = aruco::DICT_4X4_50;
-      calibrator = new CharucoCalibrator(board_size, square_length, marker_length, dictionary_id, image_size);
+      nh_private.param(CARES::Calibration::DICTIONARY_ID_I, dictionary_id, dictionary_id);
+      ROS_INFO("Using dictionary ID: %i", dictionary_id);
+      calibrator = new CharucoCalibrator(board_size, square_length, marker_length, dictionary_id, image_size, average_min_difference_threshold);
       break;
   }
 

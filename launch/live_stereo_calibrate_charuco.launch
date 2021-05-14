@@ -10,7 +10,7 @@
     <!--Number of corners-->
     <arg name="board_width"   default="8"/>
     <arg name="board_height"  default="5"/>
-    <arg name="square_length" default="39.0"/><!--mm-->
+    <arg name="square_length" default="45.0"/><!--mm-->
     <arg name="image_width"  default="1936"/>
     <arg name="image_height" default="1216"/>
 
@@ -19,8 +19,14 @@
     <!--1 Charuco-->
     <arg name="method" default="1"/>
 
+    <!--Difference Threshold-->
+    <arg name="threshold" default="25"/><!--px-->
+
     <!--Charuco marker length if required-->
-    <arg name="marker_length" default="20.0"/><!--mm-->
+    <arg name="marker_length" default="23.0"/><!--mm-->
+
+    <!--Dictionary ID-->
+    <arg name="dictionary" default="0"/><!--DICT_4X4_50-->
 
     <node name="stereo_calibration_node" pkg="stereo_calibration" type="stereo_calibration_node" output="screen">
         <param name ="save_directory"  value="$(arg save_directory)"/>
@@ -37,6 +43,10 @@
 
         <param name ="method" value="$(arg method)"/>
 
+        <param name ="threshold" value="$(arg threshold)"/>
+
         <param name ="marker_length" value="$(arg marker_length)"/>
+
+        <param name ="dictionary" value="$(arg dictionary)"/>
     </node>
 </launch>

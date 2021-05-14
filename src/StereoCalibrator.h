@@ -28,12 +28,11 @@ private:
     std::vector<std::vector<cv::Point3f> > object_points;
 
 public:
-  StereoCalibrator(Size board_size, double square_length, Size image_size){
+  StereoCalibrator(Size board_size, double square_length, Size image_size, double average_min_difference_threshold){
     this->board_size = board_size;
     this->square_length = square_length;
     this->image_size = image_size;
-    this->average_min_difference_threshold = 50;
-    ROS_INFO("Average minimum distance threshold: %f px", this->average_min_difference_threshold);
+    this->average_min_difference_threshold = average_min_difference_threshold;
 
     //Setup image windows
     std::string left_window = "Left-image";
@@ -48,12 +47,12 @@ public:
   }
 
     cares_msgs::StereoCameraInfo calibrate(std::string save_directory);
-  void processImages(Mat &left_image, Mat &right_image, std::string save_directory="");
+    void processImages(Mat &left_image, Mat &right_image, std::string save_directory="");
 
 protected:
     Size board_size;//Number of points on the board, width and height
     Size image_size;//Size of the image in pixels
-    double square_length;//Size of the squares on the calibration board in (mm)
+    double square_length;//Size of the squares on the calibration board in (m or mm)
 
     double average_min_difference_threshold;//Threshold to determine if calibration images are different enough.
 
