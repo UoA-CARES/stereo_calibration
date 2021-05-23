@@ -44,6 +44,7 @@ public:
     cv::namedWindow(right_window, cv::WINDOW_NORMAL);
     cv::resizeWindow(right_window, 600, 600);
     cv::moveWindow(right_window, 640, 20);
+    cv::waitKey(10);
   }
 
     cares_msgs::StereoCameraInfo calibrate(std::string save_directory);

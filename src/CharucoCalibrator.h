@@ -34,7 +34,6 @@ private:
 
     Ptr<aruco::Dictionary> dictionary;
     Ptr<aruco::CharucoBoard> charucoboard;
-    Ptr<aruco::Board> board;
 
     void createObjectPoints(std::vector<int> &corner_ids, std::vector<Point3f> &object_points);
 
@@ -57,8 +56,6 @@ public:
       ///<Note charucoboard is the number of squares (corner size +1) in each direction
       this->charucoboard = aruco::CharucoBoard::create(this->board_size.width+1, this->board_size.height+1,
                                                        this->square_length, this->marker_length, this->dictionary);
-
-      this->board = charucoboard.staticCast<aruco::Board>();
     }
 
 protected:
