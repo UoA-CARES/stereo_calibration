@@ -39,16 +39,16 @@ void collectImagesFromFolder(std::string image_load_file_path){
   ROS_INFO("Calibrating from Files - %s", image_load_file_path.c_str());
 
   std::vector<cv::String> filenames;
-  glob(image_load_file_path+"*.png", filenames);
+  glob(image_load_file_path+"*_left_image_color.png", filenames);
 
-  int number_of_image_pairs = filenames.size() / 2;
+  int number_of_image_pairs = filenames.size();
   ROS_INFO("Loading %d pairs of images", number_of_image_pairs);
   for(int i = 1; i < number_of_image_pairs-1; ++i) {
     Mat left_image;
     Mat right_image;
 
-    std::string left_filepath  = image_load_file_path + std::to_string(i) + "_left_rgb.png";
-    std::string right_filepath = image_load_file_path + std::to_string(i) + "_right_rgb.png";
+    std::string left_filepath  = image_load_file_path + std::to_string(i) + "_left_image_color.png";
+    std::string right_filepath = image_load_file_path + std::to_string(i) + "_right_image_color.png";
 
     if (boost::filesystem::exists(left_filepath) && boost::filesystem::exists(right_filepath)) {
       left_image = imread(left_filepath);
