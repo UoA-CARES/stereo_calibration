@@ -101,10 +101,11 @@ cares_msgs::StereoCameraInfo StereoCalibrator::calibrate(std::string save_direct
 
   Mat R1, R2, P1, P2, Q;
   Rect valid_roi[2];
+  //TODO extract out a toggle for the alpha setting
   stereoRectify(camera_matrix[0], dist_coeffs[0],
                 camera_matrix[1], dist_coeffs[1],
                 image_size, R, T, R1, R2, P1, P2, Q,
-                CALIB_ZERO_DISPARITY, 1, image_size, &valid_roi[0], &valid_roi[1]);
+                CALIB_ZERO_DISPARITY, 0, image_size, &valid_roi[0], &valid_roi[1]);
 
   double difference = (ros::Time::now().toNSec() - start.toNSec())/1000000000.0;
   ROS_INFO("Time to calculate int/ext: %f s", difference);
