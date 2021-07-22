@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
 <launch>
+    <arg name="display" default="true"/>
+
     <!--Number of corners-->
     <arg name="board_width"   default="8"/>
     <arg name="board_height"  default="5"/>
@@ -24,6 +26,8 @@
     <arg name="dictionary" default="0"/><!--DICT_4X4_50-->
 
     <node name="stereo_calibration_service" pkg="stereo_calibration" type="stereo_calibration_service" output="screen">
+        <param name="display" value="$(arg display)"/>
+
         <param name ="board_width"  value="$(arg board_width)"/>
         <param name ="board_height" value="$(arg board_height)"/>
         <param name ="square_length" value="$(arg square_length)"/>

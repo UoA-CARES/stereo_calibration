@@ -157,10 +157,13 @@ int main(int argc, char **argv){
   nh_private.param(CARES::Calibration::THRESHOLD_D, average_min_difference_threshold, average_min_difference_threshold);
   ROS_INFO("Difference Threshold: %f px", average_min_difference_threshold);
 
+  bool display;
+  nh_private.param(CARES::Calibration::DISPLAY_B, display, true);
+
   switch(calibration_method){
     case CHECKER:
       ROS_INFO("Checker board calibration");
-      calibrator = new CheckerCalibrator(board_size, square_length, image_size, average_min_difference_threshold);
+      calibrator = new CheckerCalibrator(board_size, square_length, image_size, average_min_difference_threshold, display);
       break;
     case CHARUCO:
       ROS_INFO("Charuco board calibration");
@@ -174,7 +177,7 @@ int main(int argc, char **argv){
       int dictionary_id = aruco::DICT_4X4_50;
       nh_private.param(CARES::Calibration::DICTIONARY_ID_I, dictionary_id, dictionary_id);
       ROS_INFO("Using dictionary ID: %i", dictionary_id);
-      calibrator = new CharucoCalibrator(board_size, square_length, marker_length, dictionary_id, image_size, average_min_difference_threshold);
+      calibrator = new CharucoCalibrator(board_size, square_length, marker_length, dictionary_id, image_size, average_min_difference_threshold, display);
       break;
   }
 

@@ -110,7 +110,7 @@ cares_msgs::StereoCameraInfo StereoCalibrator::calibrate(std::string save_direct
   double difference = (ros::Time::now().toNSec() - start.toNSec())/1000000000.0;
   ROS_INFO("Time to calculate int/ext: %f s", difference);
 
-  std::string caliration_file = save_directory+"calibration.json";
+  std::string caliration_file = save_directory+"stereo_calibration.json";
   ROS_INFO("Saving results to %s", caliration_file.c_str());
 
   FileStorage file(caliration_file, FileStorage::WRITE);

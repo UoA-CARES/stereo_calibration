@@ -27,6 +27,8 @@ namespace CARES{
       const std::string SAVE_DIRECTORY_PATH_S = "save_directory";
 
       const std::string THRESHOLD_D = "threshold";
+
+      const std::string DISPLAY_B = "display";
   }
 }
 

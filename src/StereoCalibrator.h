@@ -22,29 +22,35 @@
 using namespace cv;
 
 class StereoCalibrator{
+protected:
+    bool display;
 private:
     std::vector< std::vector<cv::Point2f > > all_corners[2];
     std::vector< cv::Mat > all_images[2];
     std::vector<std::vector<cv::Point3f> > object_points;
 
 public:
-  StereoCalibrator(Size board_size, double square_length, Size image_size, double average_min_difference_threshold){
+  StereoCalibrator(Size board_size, double square_length, Size image_size, double average_min_difference_threshold, bool display){
+    this->display = display;
+
     this->board_size = board_size;
     this->square_length = square_length;
     this->image_size = image_size;
     this->average_min_difference_threshold = average_min_difference_threshold;
 
     //Setup image windows
-    std::string left_window = "Left-image";
-    cv::namedWindow(left_window, cv::WINDOW_NORMAL);
-    cv::resizeWindow(left_window, 600, 600);
-    cv::moveWindow(left_window, 20, 20);
+    if(this->display) {
+      std::string left_window = "Left-image";
+      cv::namedWindow(left_window, cv::WINDOW_NORMAL);
+      cv::resizeWindow(left_window, 600, 600);
+      cv::moveWindow(left_window, 20, 20);
 
-    std::string right_window = "Right-image";
-    cv::namedWindow(right_window, cv::WINDOW_NORMAL);
-    cv::resizeWindow(right_window, 600, 600);
-    cv::moveWindow(right_window, 640, 20);
-    cv::waitKey(10);
+      std::string right_window = "Right-image";
+      cv::namedWindow(right_window, cv::WINDOW_NORMAL);
+      cv::resizeWindow(right_window, 600, 600);
+      cv::moveWindow(right_window, 640, 20);
+      cv::waitKey(10);
+    }
   }
 
     cares_msgs::StereoCameraInfo calibrate(std::string save_directory);

@@ -38,7 +38,9 @@ void CheckerCalibrator::findCorners(Mat &left_image,
   //Create matching object points
   createObjectPoints(object_points);
 
-  imshow("Left-image", left_image_copy);
-  imshow("Right-image", right_image_copy);
-  waitKey(10);
+  if(this->display) {
+    imshow("Left-image", left_image_copy);
+    imshow("Right-image", right_image_copy);
+    waitKey(10);
+  }
 }

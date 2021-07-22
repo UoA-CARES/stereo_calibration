@@ -36,8 +36,8 @@ private:
     void findCorners(Mat &image, std::vector<Point2f> &corners, Mat &image_copy);
 
 public:
-    CheckerCalibrator(Size board_size, double square_length, Size image_size, double average_min_difference_threshold)
-            : StereoCalibrator(board_size, square_length, image_size, average_min_difference_threshold) {
+    CheckerCalibrator(Size board_size, double square_length, Size image_size, double average_min_difference_threshold, bool display)
+            : StereoCalibrator(board_size, square_length, image_size, average_min_difference_threshold, display) {
     }
 
 protected:

@@ -138,8 +138,10 @@ void CharucoCalibrator::findCorners(Mat &left_image, Mat &right_image,
 //    cv::putText(left_image_copy, std::to_string(id), left_corners[i],cv::FONT_HERSHEY_COMPLEX_SMALL, 1.0, cv::Scalar(255,255,255));
   }
 
-  imshow("Left-image", left_image_copy);
-  imshow("Right-image", right_image_copy);
-  waitKey(1);
+  if(this->display) {
+    imshow("Left-image", left_image_copy);
+    imshow("Right-image", right_image_copy);
+    waitKey(1);
+  }
 }
 
