@@ -41,8 +41,8 @@ void collectImagesFromFolder(std::string image_load_file_path){
     Mat left_image;
     Mat right_image;
 
-    std::string left_filepath  = image_load_file_path + std::to_string(i) + "_left_rgb.png";
-    std::string right_filepath = image_load_file_path + std::to_string(i) + "_right_rgb.png";
+    std::string left_filepath  = image_load_file_path + std::to_string(i) + "_left_image_color.png";
+    std::string right_filepath = image_load_file_path + std::to_string(i) + "_right_image_color.png";
 
     if (boost::filesystem::exists(left_filepath) && boost::filesystem::exists(right_filepath)) {
       left_image = imread(left_filepath);

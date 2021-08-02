@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
     <!--File Path-->
-    <arg name="image_path"     default="$(env HOME)/scans/2021-05-10-10-09-13/"/>
+    <arg name="image_path"     default="$(env HOME)/calibration_images/2021-07-27-13-49-10/"/>
     <arg name="save_directory" default="$(arg image_path)"/>
 
     <!--Number of corners-->
@@ -9,8 +9,8 @@
     <arg name="board_height"  default="5"/>
     <arg name="square_length" default="45.0"/><!--mm-->
 
-    <arg name="image_width"  default="1936"/>
-    <arg name="image_height" default="1216"/>
+    <arg name="image_width"  default="2448"/>
+    <arg name="image_height" default="2048"/>
 
     <!--Calibration modes-->
     <!--0 Checker-->
