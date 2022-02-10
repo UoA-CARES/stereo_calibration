@@ -141,7 +141,7 @@ void CharucoCalibrator::findCorners(Mat &left_image, Mat &right_image,
   if(this->display) {
     imshow("Left-image", left_image_copy);
     imshow("Right-image", right_image_copy);
-    waitKey(1);
+    waitKey(10);
   }
 }
 

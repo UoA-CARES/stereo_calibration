@@ -174,7 +174,7 @@ int main(int argc, char **argv){
       }
       marker_length /= 1000.0;
       ROS_INFO("Marker length: %f m", marker_length);
-      int dictionary_id = aruco::DICT_4X4_50;
+      int dictionary_id = aruco::DICT_4X4_1000;
       nh_private.param(CARES::Calibration::DICTIONARY_ID_I, dictionary_id, dictionary_id);
       ROS_INFO("Using dictionary ID: %i", dictionary_id);
       calibrator = new CharucoCalibrator(board_size, square_length, marker_length, dictionary_id, image_size, average_min_difference_threshold, display);
