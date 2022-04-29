@@ -22,21 +22,20 @@
 //}
 
 void CharucoCalibrator::createObjectPoints(std::vector< int > &corner_ids, std::vector<Point3f> &object_points){
-//  for(int id : corner_ids){
-//    int number_of_corners
-//    object_points.push_back(this->charucoboard->chessboardCorners[id]);
-//  }
-  for (int i = 0; i < board_size.height; ++i) {
-    for (int j = 0; j < board_size.width; ++j) {
-      int id = j + i * (board_size.width);
-      if(std::find(corner_ids.begin(), corner_ids.end(), id) != corner_ids.end()) {
-        int x = j;
-        int y = (board_size.height - 1 - i);
-//        ROS_INFO("%i %i %i", x, y, id);
-        object_points.push_back(cv::Point3f(x * this->square_length, y * this->square_length, 0));
-      }
-    }
+  for(int id : corner_ids){
+    object_points.push_back(this->charucoboard->chessboardCorners[id]);
   }
+//  for (int i = 0; i < board_size.height; ++i) {
+//    for (int j = 0; j < board_size.width; ++j) {
+//      int id = j + i * (board_size.width);
+//      if(std::find(corner_ids.begin(), corner_ids.end(), id) != corner_ids.end()) {
+//        int x = j;
+//        int y = (board_size.height - 1 - i);
+////        ROS_INFO("%i %i %i", x, y, id);
+//        object_points.push_back(cv::Point3f(x * this->square_length, y * this->square_length, 0));
+//      }
+//    }
+//  }
 }
 
 void CharucoCalibrator::balanceCorners(std::vector< int > &left_ids,
