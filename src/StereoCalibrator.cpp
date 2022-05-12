@@ -79,6 +79,8 @@ cares_msgs::StereoCameraInfo StereoCalibrator::calibrate(std::string save_direct
 
   Mat camera_matrix[2];
   Mat dist_coeffs[2];
+  dist_coeffs[0] = Mat_<double>(4,1);
+  dist_coeffs[1] = Mat_<double>(4,1);
   Mat rvecs, tvecs;//unused only placed for completion of calibrateCamera
   double left_rms  = calibrateCamera(object_points, all_corners[0], image_size, camera_matrix[0], dist_coeffs[0], rvecs, tvecs);
   double right_rms = calibrateCamera(object_points, all_corners[1], image_size, camera_matrix[1], dist_coeffs[1], rvecs, tvecs);
