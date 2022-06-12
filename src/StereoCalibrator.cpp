@@ -116,6 +116,11 @@ cares_msgs::StereoCameraInfo StereoCalibrator::calibrate(std::string save_direct
   ROS_INFO("Saving results to %s", caliration_file.c_str());
 
   FileStorage file(caliration_file, FileStorage::WRITE);
+  //RMS values
+  file << "left_rms"  << left_rms;
+  file << "right_rms" << right_rms;
+  file << "rms" << rms;
+
   //Stereo
   file.write("Q", Q);
   file.write("R", R);
